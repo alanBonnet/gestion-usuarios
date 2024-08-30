@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+SQLAlchemy
+requests
+psycopg
+pyodbc
+python-dotenv
+python-jose[cryptography]
+python-multipart
+pytest
+coverage
+pillow
+alembic
+passlib[bcrypt]
+argon2_cffi
