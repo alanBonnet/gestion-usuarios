@@ -4,7 +4,7 @@ El siguiente repositorio contiene los servicios necesarios para el manejo de inf
 ## Instalación:
 
 ## Requisitos: (*)
-- Tener instalado la versión de python del momento (3.12.2).
+- Tener instalado la versión de python del momento (3.12.4).
 
 ---
 ---
@@ -35,6 +35,21 @@ Si está usando el terminal integrado de VS Code, se le pedirá reiniciarlo, y e
 pip install -r requirements.txt
 ```
 ---
+---
+
+# Cargar los datos de la migracion y los Seeders
+### Generación de las tablas según los modelos
+```cmd
+alembic revision --autogenerate
+```
+### Ejecución de las migraciones a la base de datos
+```cmd
+alembic upgrade head
+```
+### Ejecutar el Seed:
+```cmd
+python seeds_user.py
+```
 ---
 ### Levantar el servidor: (*)
 - En el archivo main está configurado para levantar en el puerto *`3002`*.

@@ -30,22 +30,24 @@ def self_user(db: Session, current_user: str):
 
 def one(id: int, db: Session, current_user: str):
     this_user = (db.query(Users_DB).filter(Users_DB.username == current_user)).first()
-    if not (this_user.role_id in [1, 2]):
+    have_permissions_to(
+        user=this_user, db=db, permissions=[PermisosEnumText.VER_USUARIOS]
+    )
 
+    user = (db.query(Users_DB).filter(Users_DB.id == id)).first()
+    print({"user": user})
+    if not user:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Acceso restringido"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado"
         )
-    user = db.query(Users_DB).filter(Users_DB.id == id)
-    return {"usuario": user}
+    return {"usuario": user, "hola": "como estas"}
 
 
 def create(body: Users, db: Session, current_user: str):
     this_user = (db.query(Users_DB).filter(Users_DB.username == current_user)).first()
-    if not (this_user.role_id in [1, 2]):
-
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Acceso restringido"
-        )
+    have_permissions_to(
+        user=this_user, db=db, permissions=[PermisosEnumText.CREAR_USUARIOS]
+    )
     l_existUsers = db.query(Users_DB).all()
     existUsers_verif = [
         existUser for existUser in l_existUsers if existUser.username == body.username
@@ -55,27 +57,26 @@ def create(body: Users, db: Session, current_user: str):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Ya existe un usuario con ese username",
         )
-    nuevo_usuario = insert(Users_DB).values(
-        {
-            "username": body.username,
-            "password": body.password,
-            "isActive": body.isActive,
-            "role_id": body.role_id.value,
-        }
+    nuevo_usuario = db.add(
+        Users_DB(
+            username=body.username,
+            password=body.password,
+            isActive=body.isActive,
+            role_id=body.role_id.value,
+        )
     )
-    db.execute(nuevo_usuario)
+
     db.commit()
+    new_user = db.query(Users_DB).filter(Users_DB.username == body.username).first()
     print(nuevo_usuario)
-    return {"detail": "Usuario creado correctamente"}
+    return {"detail": "Usuario creado correctamente", "datos_usuario": new_user}
 
 
 def update(id: int, body: UpdateUsers, db: Session, current_user: str):
     this_user = (db.query(Users_DB).filter(Users_DB.username == current_user)).first()
-    if not (this_user.role_id in [1, 2]):
-
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Acceso restringido"
-        )
+    have_permissions_to(
+        user=this_user, db=db, permissions=[PermisosEnumText.ACTUALIZAR_USUARIOS]
+    )
     nuevo_usuario = db.query(Users_DB).filter(Users_DB.id == int(id))
     nuevo_usuario.update(
         {

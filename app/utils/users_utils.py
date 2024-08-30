@@ -18,41 +18,20 @@ class ListPermissionsUser(BaseModel):
 
 
 def get_list_permissions(user: Users_DB, db: Session) -> ListPermissionsUser:
-    permis = (
-        select(
-            Users_DB, Roles, func.array_agg(Permissions.permission).label("Permissions")
-        )
-        .where(
-            Users_DB.id == user.id
-            and Users_DB.role_id == Roles.id
-            and Rela_Role_Permissions.permission_id == Permissions.id
-        )
-        .group_by(Users_DB.id, Roles.id)
-    )
-    r = db.execute(permis).first()
-    print(r)
-    print(user.id)
-    print(
-        {
-            "prueba": (
-                Users_DB.id == user.id
-                and Users_DB.role_id == Roles.id
-                and Rela_Role_Permissions.permission_id == Permissions.id
-            ).__dict__
-        }
-    )
-    # return ListPermissionsUser(
-    #     user=r[0]._asdict()["Users"].username, has_permissions=r[0][1]
-    # )
+    user_data = db.query(Users_DB).filter(Users_DB.username == user.username).first()
+    permissions_user = [
+        perm_user.permission for perm_user in user_data.role.permissions
+    ]
+    return permissions_user
 
 
 def have_permissions_to(
     user: Users_DB, db: Session, permissions: list[PermisosEnumText]
 ):
     permissions_user = get_list_permissions(user, db)
-    print({"enum_de_permisos": permissions})
-    # print({"permisos_del_usuario": permissions_user.has_permissions})
-    for p in permissions:
-        # if p.value in permissions_user.has_permissions:
-        print("SI TIENE")
-    # print([row._asdict() for row in r])
+    if len(permissions) == 1:
+        if permissions[0].value not in permissions_user:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail="No tiene permisos"
+            )
+        return permissions[0] in permissions_user

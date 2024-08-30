@@ -1,3 +1,4 @@
+from typing import TypedDict
 from fastapi import HTTPException, status
 from jose import ExpiredSignatureError, JWTError, jwt
 from datetime import datetime, timedelta
@@ -29,7 +30,7 @@ def create_access_token(data: dict):  # -> dict[str, int]:
     return {"token": encoded_jwt, "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES}
 
 
-def verificar_token(token: str, credentials_exception):
+def verificar_token(token: str, credentials_exception) -> TokenData:
     """
     Verifica el token y retorna el contenido del mismo a la función que lo llame
     aplica validación de existencia y expiración

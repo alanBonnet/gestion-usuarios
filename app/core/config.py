@@ -1,4 +1,5 @@
 import os
+from typing import TypedDict
 from dotenv import load_dotenv
 from pathlib import Path
 
@@ -47,9 +48,14 @@ database_configs: list[DbConfig] = [
         password=os.getenv("PGSQL_PASSWORD"),
         dbname=os.getenv("PGSQL_DBNAME_P0"),
         host=os.getenv("PGSQL_HOST"),
+        port=5432,
         identity="Gestion_Usuarios",
     )
 ]
+
+
+class DbConfigTyped(TypedDict):
+    Gestion_Usuarios: str
 
 
 class Settings:
@@ -62,7 +68,7 @@ class Settings:
     DB_MAIN = "POSTGRESQL"
     SECRET_KEY: str = os.getenv("SECRET_KEY")
     ALGORITHM_HASH: str = os.getenv("ALGORITHM_HASH")
-    URL_DBs: dict[str, str] = {
+    URL_DBs: DbConfigTyped = {
         config.identity: config.get_db_url() for config in database_configs
     }
     # print(URL_DBs)

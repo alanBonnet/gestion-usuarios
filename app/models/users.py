@@ -92,21 +92,21 @@ class Users(Base):
         return pwd_context.verify(password, self.password)  # type: ignore
 
 
-# def hash_password_before_insert(mapper, connection, target):
-#     if target.password:
+def hash_password_before_insert(mapper, connection, target):
+    if target.password:
 
-#         target.password = pwd_context.hash(target.password)
+        target.password = pwd_context.hash(target.password)
 
 
 # # función para hashear la contraseña antes de actualizar
-# def hash_password_before_update(mapper, connection, target):
-#     # fe asegura de que la contraseña no se hashee nuevamente si no ha cambiado
-#     state = target._sa_instance_state
-#     hist = state.attrs.password.history
-#     if hist.has_changes() and target.password:
-#         target.password = pwd_context.hash(target.password)
+def hash_password_before_update(mapper, connection, target):
+    # te asegura de que la contraseña no se hashee nuevamente si no ha cambiado
+    state = target._sa_instance_state
+    hist = state.attrs.password.history
+    if hist.has_changes() and target.password:
+        target.password = pwd_context.hash(target.password)
 
 
 # # asociar las funciones de evento con las operaciones before_insert y before_update
-# event.listen(target=Users, identifier="before_insert", fn=hash_password_before_insert)
-# event.listen(Users, "before_update", hash_password_before_update)
+event.listen(target=Users, identifier="before_insert", fn=hash_password_before_insert)
+event.listen(Users, "before_update", hash_password_before_update)

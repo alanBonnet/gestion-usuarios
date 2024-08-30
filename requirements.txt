@@ -3,6 +3,7 @@ uvicorn
 SQLAlchemy
 requests
 psycopg
+psycopg[binary]
 pyodbc
 python-dotenv
 python-jose[cryptography]
