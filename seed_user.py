@@ -31,7 +31,16 @@ def assign_permissions_to_roles(roles: list[Roles], permissions: list[Permission
         )
 
     # Permisos para MODERADOR (todos menos ELIMINAR_USUARIOS)
-
+    for permission in permissions:
+        if permission.permission not in [
+            "ELIMINAR_USUARIOS",
+        ]:
+            session.add(
+                Rela_Role_Permissions(
+                    role_id=roles[1].id,
+                    permission_id=permission.id,
+                )
+            )
     # Permisos para USUARIO (solo permisos relacionados con tareas)
     for permission in permissions:
         if permission.permission in [
@@ -71,7 +80,6 @@ def create_default_roles_and_permissions() -> tuple[Roles, list[Permissions]]:
 
     for role in roles:
         session.add(role)
-
     # TODO: incorporar los permisos a cada role
     for permission in permissions_db:
         session.add(permission)

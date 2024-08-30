@@ -1,19 +1,8 @@
-from pydantic import BaseModel, Field
 from datetime import datetime
-from typing import Optional, Annotated
+from pydantic import BaseModel, Field
+from typing import Annotated
 from enum import Enum
 from app.utils.types import NVARCHAR_16, NVARCHAR_50, NVARCHAR_100_NULLABLE
-
-
-class PermisosEnum(Enum):
-    VER_USUARIOS = 1
-    CREAR_USUARIOS = 2
-    ACTUALIZAR_USUARIOS = 3
-    ELIMINAR_USUARIOS = 4
-    VER_TAREAS = 5
-    CREAR_TAREAS = 6
-    ACTUALIZAR_TAREAS = 7
-    ELIMINAR_TAREAS = 8
 
 
 class PermisosEnumText(Enum):
@@ -33,11 +22,30 @@ class RolesEnum(Enum):
     USER = 3
 
 
-class Users(BaseModel):
+class User(BaseModel):
     username: NVARCHAR_16
-    password: NVARCHAR_16
     isActive: bool
     role_id: RolesEnum
+
+
+class Permission(BaseModel):
+    permission: str
+    id: int
+
+
+class Role(BaseModel):
+    id: int
+    role: str
+    permissions: list[Permission]
+
+
+class UserExtendido(User):
+    createdAt: datetime
+    updatedAt: datetime
+    role: Role
+
+    class Config:
+        from_attributes = True
 
 
 class Tareas(BaseModel):
@@ -50,8 +58,12 @@ class UpdateUsers(BaseModel):
     isActive: bool
 
 
-class ShowUsers(BaseModel):
-    pass
+class ShowSelfUser(BaseModel):
+    usuario_actual: User
 
-    class Config:
-        from_attributes = True
+
+class ShowUsers(BaseModel):
+    usuarios_list: list[UserExtendido]
+
+    # class Config:
+    #     from_attributes = True

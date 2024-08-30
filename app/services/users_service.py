@@ -5,7 +5,7 @@ from app.models.users import (
     Users as Users_DB,
 )
 from fastapi import HTTPException, status
-from app.schemas.users import PermisosEnumText, Users, UpdateUsers
+from app.schemas.users import PermisosEnumText, User, UpdateUsers
 from sqlalchemy.orm import Session
 import sqlalchemy as sa
 from sqlalchemy import select, insert, update, delete, func
@@ -18,13 +18,12 @@ def list(db: Session, current_user: str):
     have_permissions_to(
         user=this_user, db=db, permissions=[PermisosEnumText.VER_USUARIOS]
     )
-    users = db.query(Users_DB).all()
+    users = db.query(Users_DB).filter(Users_DB.role_id > this_user.role_id).all()
     return users
 
 
 def self_user(db: Session, current_user: str):
     this_user = (db.query(Users_DB).filter(Users_DB.username == current_user)).first()
-
     return {"usuario_actual": this_user}
 
 
@@ -40,10 +39,10 @@ def one(id: int, db: Session, current_user: str):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Usuario no encontrado"
         )
-    return {"usuario": user, "hola": "como estas"}
+    return {"usuario": user}
 
 
-def create(body: Users, db: Session, current_user: str):
+def create(body: User, db: Session, current_user: str):
     this_user = (db.query(Users_DB).filter(Users_DB.username == current_user)).first()
     have_permissions_to(
         user=this_user, db=db, permissions=[PermisosEnumText.CREAR_USUARIOS]
