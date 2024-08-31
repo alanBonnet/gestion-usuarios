@@ -1,6 +1,13 @@
 from fastapi import APIRouter, Depends, Response
 from sqlalchemy.orm import Session
-from app.schemas.users import ShowSelfUser, User, ShowUsers, UpdateUsers, UserExtendido
+from app.schemas.users import (
+    CreateUser,
+    ShowSelfUser,
+    User,
+    ShowUsers,
+    UpdateUsers,
+    UserExtendido,
+)
 from app.services import users_service
 from app.db.database import get_db_P0
 from app.utils.oauth import obtener_sesion_usuario
@@ -45,7 +52,7 @@ def obtener_un_user(
     #  response_model=ShowUsers
 )
 def registrar_users(
-    users: User,
+    users: CreateUser,
     db: Session = Depends(get_db_P0),
     current_user: TokenData = Depends(obtener_sesion_usuario),
 ):

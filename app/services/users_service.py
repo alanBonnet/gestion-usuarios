@@ -5,7 +5,7 @@ from app.models.users import (
     Users as Users_DB,
 )
 from fastapi import HTTPException, status
-from app.schemas.users import PermisosEnumText, User, UpdateUsers
+from app.schemas.users import CreateUser, PermisosEnumText, User, UpdateUsers
 from sqlalchemy.orm import Session
 import sqlalchemy as sa
 from sqlalchemy import select, insert, update, delete, func
@@ -42,7 +42,7 @@ def one(id: int, db: Session, current_user: str):
     return {"usuario": user}
 
 
-def create(body: User, db: Session, current_user: str):
+def create(body: CreateUser, db: Session, current_user: str):
     this_user = (db.query(Users_DB).filter(Users_DB.username == current_user)).first()
     have_permissions_to(
         user=this_user, db=db, permissions=[PermisosEnumText.CREAR_USUARIOS]

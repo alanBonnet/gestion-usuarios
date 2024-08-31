@@ -28,6 +28,13 @@ class User(BaseModel):
     role_id: RolesEnum
 
 
+class CreateUser(User):
+    password: NVARCHAR_16
+
+    class Config:
+        from_attributes = True
+
+
 class Permission(BaseModel):
     permission: str
     id: int
